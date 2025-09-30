@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
@@ -26,8 +27,8 @@ export default function AdminAuth() {
 
   const navigate = useNavigate();
 
-  // Use relative URL for Vercel API
-  const API_BASE_URL = "https://time-kids-app-backend.vercel.app"
+  // Backend API base
+  const API_BASE_URL = "https://time-kids-app-backend.vercel.app";
 
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
@@ -49,7 +50,7 @@ export default function AdminAuth() {
     if (!logInPassword) return alert("Password is required");
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/login`, {
+      const response = await axios.post(`${API_BASE_URL}/api/user/login`, {
         email: logInEmail,
         password: logInPassword,
       });
@@ -69,7 +70,7 @@ export default function AdminAuth() {
     if (!signUpPassword) return alert("Password is required");
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/register`, {
+      const response = await axios.post(`${API_BASE_URL}/api/user/register`, {
         name: signUpUsername,
         email: signUpEmail,
         password: signUpPassword,
