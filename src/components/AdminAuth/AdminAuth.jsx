@@ -27,7 +27,7 @@ export default function AdminAuth() {
   const navigate = useNavigate();
 
   // Use relative URL for Vercel API
-  const API_BASE_URL = "https://time-kids-app-backend.vercel.app/"
+  const API_BASE_URL = "https://time-kids-app-backend.vercel.app"
 
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
