@@ -20,7 +20,7 @@ export default function Blog() {
     // Fetch blogs from backend
     const fetchBlogs = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/api/blog");
+            const response = await axios.get("https://time-kids-app-backend.vercel.app/api/blog");
             const data = response.data;
             if (data.success) {
                 setBlogData(data.data);
@@ -57,7 +57,7 @@ export default function Blog() {
         }
 
         try {
-            const response = await axios.post("http://localhost:5000/api/blog", {
+            const response = await axios.post("https://time-kids-app-backend.vercel.app/api/blog", {
                 blogImage: imagePreview ,
                 title: newBlog.title,
                 shortContent: newBlog.shortContent,
@@ -91,7 +91,7 @@ export default function Blog() {
     const handleDeleteBlog = async (blogId) => {
         if (window.confirm('Are you sure you want to delete this blog post?')) {
             try {
-                const response = await axios.delete("http://localhost:5000/api/blog", {
+                const response = await axios.delete("https://time-kids-app-backend.vercel.app/api/blog", {
                     data: { id: blogId }
                 });
 

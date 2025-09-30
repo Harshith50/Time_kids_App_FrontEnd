@@ -26,54 +26,27 @@ export default function AdminAuth() {
 
   const navigate = useNavigate();
 
-  const API_BASE_URL = "http://localhost:5000/api/user";
+  // Use relative URL for Vercel API
+  const API_BASE_URL = "https://time-kids-app-backend.vercel.app/api/user"
 
-  // Email validation regex
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-  // Login email input change handler
+  // Handlers
   const handleLogInEmailChange = (e) => {
     const email = e.target.value;
     setLogInEmail(email);
-
-    if (email && !validateEmail(email)) {
-      setLogInEmailError("Please enter a valid email address");
-    } else {
-      setLogInEmailError("");
-    }
+    setLogInEmailError(email && !validateEmail(email) ? "Please enter a valid email address" : "");
   };
 
-  // Signup email input change handler
   const handleSignUpEmailChange = (e) => {
     const email = e.target.value;
     setSignUpEmail(email);
-
-    if (email && !validateEmail(email)) {
-      setSignUpEmailError("Please enter a valid email address");
-    } else {
-      setSignUpEmailError("");
-    }
+    setSignUpEmailError(email && !validateEmail(email) ? "Please enter a valid email address" : "");
   };
 
-  // Handle login submit
   const handleSignInSubmit = async () => {
-    if (!logInEmail) {
-      setLogInEmailError("Email is required");
-      return;
-    }
-
-    if (!validateEmail(logInEmail)) {
-      setLogInEmailError("Please enter a valid email address");
-      return;
-    }
-
-    if (!logInPassword) {
-      alert("Password is required");
-      return;
-    }
+    if (!logInEmail || !validateEmail(logInEmail)) return setLogInEmailError("Valid email required");
+    if (!logInPassword) return alert("Password is required");
 
     try {
       const response = await axios.post(`${API_BASE_URL}/login`, {
@@ -81,40 +54,19 @@ export default function AdminAuth() {
         password: logInPassword,
       });
 
-      alert("Login successful!");
-
-      // Save token and update login state
       localStorage.setItem("token", response.data.token);
       setIsLoggedIn(true);
-
+      alert("Login successful!");
       navigate("/");
     } catch (error) {
-      const message = error.response?.data?.message || "Login failed";
-      alert(message);
+      alert(error.response?.data?.message || "Login failed");
     }
   };
 
-  // Handle signup submit
   const handleSignUpSubmit = async () => {
-    if (!signUpUsername) {
-      alert("Username is required");
-      return;
-    }
-
-    if (!signUpEmail) {
-      setSignUpEmailError("Email is required");
-      return;
-    }
-
-    if (!validateEmail(signUpEmail)) {
-      setSignUpEmailError("Please enter a valid email address");
-      return;
-    }
-
-    if (!signUpPassword) {
-      alert("Password is required");
-      return;
-    }
+    if (!signUpUsername) return alert("Username is required");
+    if (!signUpEmail || !validateEmail(signUpEmail)) return setSignUpEmailError("Valid email required");
+    if (!signUpPassword) return alert("Password is required");
 
     try {
       const response = await axios.post(`${API_BASE_URL}/register`, {
@@ -123,20 +75,15 @@ export default function AdminAuth() {
         password: signUpPassword,
       });
 
-      alert("Signup successful!");
-
-      // Save token and update login state
       localStorage.setItem("token", response.data.token);
       setIsLoggedIn(true);
-
+      alert("Signup successful!");
       navigate("/");
     } catch (error) {
-      const message = error.response?.data?.message || "Signup failed";
-      alert(message);
+      alert(error.response?.data?.message || "Signup failed");
     }
   };
 
-  // Logout handler
   const handleLogout = () => {
     localStorage.removeItem("token");
     setIsLoggedIn(false);
@@ -144,168 +91,43 @@ export default function AdminAuth() {
     alert("Logged out successfully");
   };
 
-  // Render
   return (
     <div className="auth-container">
       <div className="form-card">
         {isLoggedIn ? (
           <div className="logged-in-container">
             <h2>You are logged in as Admin.</h2>
-            <button onClick={handleLogout} className="logout-button">
-              Logout
-            </button>
+            <button onClick={handleLogout} className="logout-button">Logout</button>
           </div>
         ) : (
           <>
-            {/* Toggle Tabs */}
             <div className="tab-container">
-              <button
-                onClick={() => setIsSignIn(true)}
-                className={`tab ${isSignIn ? "active" : "inactive"}`}
-              >
-                Admin Login
-              </button>
-              <button
-                onClick={() => setIsSignIn(false)}
-                className={`tab ${!isSignIn ? "active" : "inactive"}`}
-              >
-                Admin Signup
-              </button>
+              <button onClick={() => setIsSignIn(true)} className={isSignIn ? "active" : ""}>Admin Login</button>
+              <button onClick={() => setIsSignIn(false)} className={!isSignIn ? "active" : ""}>Admin Signup</button>
             </div>
 
             {isSignIn ? (
-              // Login Form
               <div>
                 <h1 className="title">Login</h1>
-                <div className="form-container">
-                  <div className="field-group">
-                    <label htmlFor="signInEmail" className="label">
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      id="signInEmail"
-                      value={logInEmail}
-                      onChange={handleLogInEmailChange}
-                      placeholder="Enter your email"
-                      className={`input ${logInEmailError ? "error" : ""}`}
-                    />
-                    {logInEmailError && (
-                      <span className="error-message">{logInEmailError}</span>
-                    )}
-                  </div>
-
-                  <div className="field-group">
-                    <label htmlFor="signInPassword" className="label">
-                      Password
-                    </label>
-                    <input
-                      type={showLogInPassword ? "text" : "password"}
-                      id="signInPassword"
-                      value={logInPassword}
-                      onChange={(e) => setLogInPassword(e.target.value)}
-                      placeholder="Enter your password"
-                      className="input"
-                    />
-                  </div>
-
-                  <div className="checkbox-container">
-                    <input
-                      type="checkbox"
-                      id="showSignInPassword"
-                      checked={showLogInPassword}
-                      onChange={(e) => setShowLogInPassword(e.target.checked)}
-                      className="checkbox"
-                    />
-                    <label
-                      htmlFor="showSignInPassword"
-                      className="checkbox-label"
-                    >
-                      Show password
-                    </label>
-                  </div>
-
-                  <button
-                    onClick={handleSignInSubmit}
-                    className="submit-button"
-                  >
-                    Log In
-                  </button>
-                </div>
+                <input type="email" value={logInEmail} onChange={handleLogInEmailChange} placeholder="Email" />
+                {logInEmailError && <span>{logInEmailError}</span>}
+                <input type={showLogInPassword ? "text" : "password"} value={logInPassword} onChange={(e) => setLogInPassword(e.target.value)} placeholder="Password" />
+                <label>
+                  <input type="checkbox" checked={showLogInPassword} onChange={(e) => setShowLogInPassword(e.target.checked)} /> Show password
+                </label>
+                <button onClick={handleSignInSubmit}>Log In</button>
               </div>
             ) : (
-              // Signup Form
               <div>
                 <h1 className="title">Admin Signup</h1>
-                <div className="form-container">
-                  <div className="field-group">
-                    <label htmlFor="signUpUsername" className="label">
-                      Username
-                    </label>
-                    <input
-                      type="text"
-                      id="signUpUsername"
-                      value={signUpUsername}
-                      onChange={(e) => setSignUpUsername(e.target.value)}
-                      placeholder="Enter your username"
-                      className="input"
-                    />
-                  </div>
-
-                  <div className="field-group">
-                    <label htmlFor="signUpEmail" className="label">
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      id="signUpEmail"
-                      value={signUpEmail}
-                      onChange={handleSignUpEmailChange}
-                      placeholder="Enter your email"
-                      className={`input ${signUpEmailError ? "error" : ""}`}
-                    />
-                    {signUpEmailError && (
-                      <span className="error-message">{signUpEmailError}</span>
-                    )}
-                  </div>
-
-                  <div className="field-group">
-                    <label htmlFor="signUpPassword" className="label">
-                      Password
-                    </label>
-                    <input
-                      type={showSignUpPassword ? "text" : "password"}
-                      id="signUpPassword"
-                      value={signUpPassword}
-                      onChange={(e) => setSignUpPassword(e.target.value)}
-                      placeholder="Enter your password"
-                      className="input"
-                    />
-                  </div>
-
-                  <div className="checkbox-container">
-                    <input
-                      type="checkbox"
-                      id="showSignUpPassword"
-                      checked={showSignUpPassword}
-                      onChange={(e) => setShowSignUpPassword(e.target.checked)}
-                      className="checkbox"
-                    />
-                    <label
-                      htmlFor="showSignUpPassword"
-                      className="checkbox-label"
-                    >
-                      Show password
-                    </label>
-                  </div>
-
-                  <button
-                    onClick={handleSignUpSubmit}
-                    className="submit-button"
-                  >
-                    Sign Up
-                  </button>
-                </div>
+                <input type="text" value={signUpUsername} onChange={(e) => setSignUpUsername(e.target.value)} placeholder="Username" />
+                <input type="email" value={signUpEmail} onChange={handleSignUpEmailChange} placeholder="Email" />
+                {signUpEmailError && <span>{signUpEmailError}</span>}
+                <input type={showSignUpPassword ? "text" : "password"} value={signUpPassword} onChange={(e) => setSignUpPassword(e.target.value)} placeholder="Password" />
+                <label>
+                  <input type="checkbox" checked={showSignUpPassword} onChange={(e) => setShowSignUpPassword(e.target.checked)} /> Show password
+                </label>
+                <button onClick={handleSignUpSubmit}>Sign Up</button>
               </div>
             )}
           </>
